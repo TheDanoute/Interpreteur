@@ -153,22 +153,22 @@ Noeud* Interpreteur::instTantQue() {
 }
 
 Noeud* Interpreteur::instRepeter() {
-	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
+	// <instRepeter> ::= repeter <seqInst> jusqua ( <expression> )
 	return nullptr;
 }
 
 Noeud* Interpreteur::instPour() {
-	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
+	// <instPour> ::= pour ( [ <affectation> ] ) ; <expression> ; ( [ <affectation> ] ) <seqInst>	 finpour
 	return nullptr;
 }
 
 Noeud* Interpreteur::instEcrire() {
-	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
+	// <instEcrire> ::= ecrire ( <expression> | <chaine> | { , <expression> | <chaine> } )
 	return nullptr;
 }
 
 Noeud* Interpreteur::instLire() {
-	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
+	//  <instLire> ::= lire ( <variable> { , <variable> } )
 	return nullptr;
 }
 
