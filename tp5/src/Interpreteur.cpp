@@ -56,7 +56,7 @@ Noeud* Interpreteur::seqInst() {
   NoeudSeqInst* sequence = new NoeudSeqInst();
   do {
     sequence->ajoute(inst());
-  } while (m_lecteur.getSymbole() == "<VARIABLE>" || m_lecteur.getSymbole() == "si");
+  } while (m_lecteur.getSymbole() == "<VARIABLE>" || m_lecteur.getSymbole() == "si" || m_lecteur.getSymbole() == "tantque" || m_lecteur.getSymbole() == "repeter" || m_lecteur.getSymbole() == "pour" || m_lecteur.getSymbole() == "ecrire" || m_lecteur.getSymbole() == "lire");
   // Tant que le symbole courant est un début possible d'instruction...
   // Il faut compléter cette condition chaque fois qu'on rajoute une nouvelle instruction
   return sequence;
@@ -72,6 +72,16 @@ Noeud* Interpreteur::inst() {
   else if (m_lecteur.getSymbole() == "si")
     return instSi();
   // Compléter les alternatives chaque fois qu'on rajoute une nouvelle instruction
+  else if (m_lecteur.getSymbole() == "tantque")
+	  return instTantQue();
+  else if (m_lecteur.getSymbole() == "repeter")
+  	  return instRepeter();
+  else if (m_lecteur.getSymbole() == "pour")
+  	  return instPour();
+  else if (m_lecteur.getSymbole() == "ecrire")
+  	  return instEcrire();
+  else if (m_lecteur.getSymbole() == "lire")
+  	  return instLire();
   else erreur("Instruction incorrecte");
 }
 
@@ -136,4 +146,30 @@ Noeud* Interpreteur::instSi() {
   testerEtAvancer("finsi");
   return new NoeudInstSi(condition, sequence); // Et on renvoie un noeud Instruction Si
 }
+
+Noeud* Interpreteur::instTantQue() {
+	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
+	return nullptr;
+}
+
+Noeud* Interpreteur::instRepeter() {
+	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
+	return nullptr;
+}
+
+Noeud* Interpreteur::instPour() {
+	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
+	return nullptr;
+}
+
+Noeud* Interpreteur::instEcrire() {
+	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
+	return nullptr;
+}
+
+Noeud* Interpreteur::instLire() {
+	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
+	return nullptr;
+}
+
 
