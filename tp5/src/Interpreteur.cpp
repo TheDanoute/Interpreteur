@@ -137,7 +137,7 @@ Noeud* Interpreteur::facteur() {
 }
 
 Noeud* Interpreteur::instSi() {
-  // <instSi> ::= si ( <expression> ) <seqInst> finsi
+  // <instSi> ::= si ( <expression> ) <seqInst> { sinonsi ( <expression> ) <seqInst> } [sinon <seqInst>] finsi
   testerEtAvancer("si");
   testerEtAvancer("(");
   Noeud* condition = expression(); // On mémorise la condition
@@ -149,6 +149,12 @@ Noeud* Interpreteur::instSi() {
 
 Noeud* Interpreteur::instTantQue() {
 	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
+	testerEtAvancer("tantque");
+	testerEtAvancer("(");
+	Noeud* condition = expression(); //On mémorise la condition
+	testerEtAvancer(")");
+	Noeud* sequence = seqInst();
+	testerEtAvancer("fintantque");
 	return nullptr;
 }
 
