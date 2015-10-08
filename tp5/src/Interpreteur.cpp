@@ -165,6 +165,12 @@ Noeud* Interpreteur::instRepeter() {
 
 Noeud* Interpreteur::instPour() {
 	// <instPour> ::= pour ( [ <affectation> ] ) ; <expression> ; ( [ <affectation> ] ) <seqInst>	 finpour
+	testerEtAvancer("pour");
+	testerEtAvancer("(");
+	Noeud* condition = expression();
+	testerEtAvancer(")");
+	Noeud* sequence = seqInst();
+	testerEtAvancer("finpour");
 	return nullptr;
 }
 
