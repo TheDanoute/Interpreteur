@@ -75,7 +75,34 @@ NoeudInstSi::NoeudInstSi(Noeud* condition, Noeud* sequence)
 : m_condition(condition), m_sequence(sequence) {
 }
 
+////////////////////////////////////////////////////////////////////////////////
+// NoeudInstTantQue
+////////////////////////////////////////////////////////////////////////////////
+
+NoeudInstTantQue::NoeudInstTantQue(Noeud* condition, Noeud* sequence)
+: m_condition(condition), m_sequence(sequence) {
+}
+
+NoeudInstPour::NoeudInstPour(Noeud* condition, Noeud* sequence, Noeud* affect, Noeud* affect2)
+: m_condition(condition), m_sequence(sequence), m_affect(affect), m_affect2(affect2) {
+
+}
+
 int NoeudInstSi::executer() {
-  if (m_condition->executer()) m_sequence->executer();
-  return 0; // La valeur renvoyée ne représente rien !
+	if (m_condition->executer()) m_sequence->executer();
+	return 0; // La valeur renvoyée ne représente rien !
+}
+
+int NoeudInstTantQue::executer() {
+	while (m_condition->executer()) m_sequence->executer();
+	return 0; // La valeur renvoyée ne représente rien !
+}
+
+int NoeudInstPour::executer() {
+	m_affect->executer();
+	while (m_condition->executer()) {
+		m_sequence->executer();
+		m_affect2->executer();
+	}
+	return 0; // La valeur renvoyée ne représente rien !
 }

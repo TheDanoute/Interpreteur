@@ -70,7 +70,7 @@ Noeud* Interpreteur::inst() {
     return affect;
   }
   else if (m_lecteur.getSymbole() == "si")
-    return instSi();
+	  return instSi();
   // Compléter les alternatives chaque fois qu'on rajoute une nouvelle instruction
   else if (m_lecteur.getSymbole() == "tantque")
 	  return instTantQue();
@@ -151,11 +151,11 @@ Noeud* Interpreteur::instTantQue() {
 	// <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
 	testerEtAvancer("tantque");
 	testerEtAvancer("(");
-	Noeud* condition = expression(); //On mémorise la condition
+	Noeud* condition = expression();// On mémorise la condition
 	testerEtAvancer(")");
-	Noeud* sequence = seqInst();
+	Noeud* sequence = seqInst();	// On mémorise la séquence d'instruction
 	testerEtAvancer("fintantque");
-	return nullptr;
+	return new NoeudInstTantQue(condition, sequence);	// Et on renvoie un noeud Instruction TantQue
 }
 
 Noeud* Interpreteur::instRepeter() {
@@ -167,12 +167,25 @@ Noeud* Interpreteur::instPour() {
 	// <instPour> ::= pour ( [ <affectation> ] ) ; <expression> ; ( [ <affectation> ] ) <seqInst>	 finpour
 	testerEtAvancer("pour");
 	testerEtAvancer("(");
-	Noeud* condition = expression();
+	Noeud * affect = nullptr;
+	if(m_lecteur.getSymbole()=="<VARIABLE>") {
+		Noeud* affect = affectation();	// On mémorise l'affectation s'il y en a une
+	}
+	Noeud* condition = expression();	// On mémorise la condition
 	testerEtAvancer(")");
-	Noeud* sequence = seqInst();
+	Noeud* affect2 = nullptr;
+	if(m_lecteur.getSymbole()=="<VARIABLE>") {
+		Noeud* affect2 = affectation();	// On mémorise l'affectation2 s'il y en a une
+	}
+	Noeud* sequence = seqInst();		// On mémorise la séquence d'instruction
 	testerEtAvancer("finpour");
-	return nullptr;
-}
+	if(affect==nullptr && affect2==nullptr)
+		return new NoeudInstPour(condition,sequence);
+	else if(affect!=nullptr && affect2==nullptr)
+		return new NoeudInstPour(condition,sequence,affect);
+	else if(affect==nullptr && affect2!=nullptr)
+		return new NoeudInstPour(condition,sequence,nullptr,affect2);
+	}
 
 Noeud* Interpreteur::instEcrire() {
 	// <instEcrire> ::= ecrire ( <expression> | <chaine> | { , <expression> | <chaine> } )
