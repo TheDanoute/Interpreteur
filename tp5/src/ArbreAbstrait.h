@@ -72,8 +72,26 @@ class NoeudInstSi : public Noeud {
 //  et ses 2 fils : la condition du si et la séquence d'instruction associée
   public:
     NoeudInstSi(Noeud* condition, Noeud* sequence);
+    void ajouterSinonsi(Noeud * instSinonsi);
+    void ajouterSinon(Noeud * sequence);
      // Construit une "instruction si" avec sa condition et sa séquence d'instruction
    ~NoeudInstSi() {} // A cause du destructeur virtuel de la classe Noeud
+    int executer();  // Exécute l'instruction si : si condition vraie on exécute la séquence
+
+  private:
+    Noeud*  m_condition;
+    Noeud*  m_sequence;
+    vector<Noeud*>m_sinonsi;
+    Noeud* m_sinon;
+};
+
+class NoeudInstSinonsi : public Noeud {
+// Classe pour représenter un noeud "instruction si"
+//  et ses 2 fils : la condition du si et la séquence d'instruction associée
+  public:
+    NoeudInstSinonsi(Noeud* condition, Noeud* sequence);
+     // Construit une "instruction si" avec sa condition et sa séquence d'instruction
+   ~NoeudInstSinonsi() {} // A cause du destructeur virtuel de la classe Noeud
     int executer();  // Exécute l'instruction si : si condition vraie on exécute la séquence
 
   private:
@@ -111,6 +129,20 @@ private:
 	Noeud* m_sequence;
 	Noeud* m_affect;
 	Noeud* m_affect2 ;
+};
+
+class NoeudInstRepeter : public Noeud {
+// Classe pour représenter un noeud "instruction tantque"
+// et ses 2 fils : la condition du tanque et la séquence d'instruction associée
+public:
+	NoeudInstRepeter(Noeud* condition, Noeud* sequence);
+	// Construit une "instruction tantque" avec sa condition et sa séquence d'instruction
+	~NoeudInstRepeter() {}// A cause du destructeur virtuel de la classe Noeud
+	int executer(); // Exécute l'instruction tantque : si condition vraie on exécute la séquence
+
+private:
+	Noeud* m_condition;
+	Noeud* m_sequence;
 };
 
 

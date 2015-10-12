@@ -71,8 +71,43 @@ int NoeudOperateurBinaire::executer() {
 // NoeudInstSi
 ////////////////////////////////////////////////////////////////////////////////
 
+NoeudInstSinonsi::NoeudInstSinonsi(Noeud* condition, Noeud* sequence)
+: m_condition(condition), m_sequence(sequence) {
+}
+
+int NoeudInstSinonsi::executer(){
+	int final=0;
+	if (m_condition->executer()) {
+		final=1;
+		m_sequence->executer();
+	}
+	return final;
+}
+
 NoeudInstSi::NoeudInstSi(Noeud* condition, Noeud* sequence)
 : m_condition(condition), m_sequence(sequence) {
+	m_sinon=nullptr;
+}
+void NoeudInstSi::ajouterSinonsi(Noeud * instSinonsi){
+	m_sinonsi.push_back(instSinonsi);
+}
+void NoeudInstSi::ajouterSinon(Noeud * sequence){
+	m_sinon=sequence;
+}
+
+int NoeudInstSi::executer() {
+  if (m_condition->executer())
+	  m_sequence->executer();
+  else {
+	  int condition = 0;
+	  for(auto instSinonSi : m_sinonsi){
+		  if (condition<1)
+			  condition+=instSinonSi->executer();
+	  }
+	  if(condition < 1 && m_sinon!=nullptr)
+		  m_sinon->executer();
+	  }
+  return 0; // La valeur renvoyée ne représente rien !
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,11 +123,6 @@ NoeudInstPour::NoeudInstPour(Noeud* condition, Noeud* sequence, Noeud* affect, N
 
 }
 
-int NoeudInstSi::executer() {
-	if (m_condition->executer()) m_sequence->executer();
-	return 0; // La valeur renvoyée ne représente rien !
-}
-
 int NoeudInstTantQue::executer() {
 	while (m_condition->executer()) m_sequence->executer();
 	return 0; // La valeur renvoyée ne représente rien !
@@ -104,5 +134,16 @@ int NoeudInstPour::executer() {
 		m_sequence->executer();
 		m_affect2->executer();
 	}
+	return 0; // La valeur renvoyée ne représente rien !
+}
+NoeudInstRepeter::NoeudInstRepeter(Noeud* condition, Noeud* sequence)
+: m_condition(condition), m_sequence(sequence) {
+}
+
+int NoeudInstRepeter::executer() {
+	do {
+		m_sequence->executer();
+	}
+	while (m_condition->executer());
 	return 0; // La valeur renvoyée ne représente rien !
 }

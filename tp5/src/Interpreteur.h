@@ -33,7 +33,7 @@ private:
     Noeud*  expression();  //  <expression> ::= <facteur> { <opBinaire> <facteur> }
     Noeud*  facteur();     //     <facteur> ::= <entier>  |  <variable>  |  - <facteur>  | non <facteur> | ( <expression> )
                            //   <opBinaire> ::= + | - | *  | / | < | > | <= | >= | == | != | et | ou
-    Noeud*  instSi();      //      <instSi> ::= si ( <expression> ) <seqInst> { sinonsi ( <expression> ) <seqInst> } [sinon <seqInst>] finsi
+    Noeud*  instSi() throw (SyntaxeException);      //      <instSi> ::= si ( <expression> ) <seqInst> { sinonsi ( <expression> ) <seqInst> } [sinon <seqInst>] finsi
     Noeud*  instTantQue(); // <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
     Noeud*  instRepeter(); // <instRepeter> ::= repeter <seqInst> jusqua ( <expression> )
     Noeud*  instPour();    //    <instPour> ::= pour ( [ <affectation> ] ) ; <expression> ; ( [ <affectation> ] ) <seqInst>	 finpour

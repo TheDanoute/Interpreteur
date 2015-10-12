@@ -136,15 +136,32 @@ Noeud* Interpreteur::facteur() {
   return fact;
 }
 
-Noeud* Interpreteur::instSi() {
+Noeud* Interpreteur::instSi() throw (SyntaxeException){
   // <instSi> ::= si ( <expression> ) <seqInst> { sinonsi ( <expression> ) <seqInst> } [sinon <seqInst>] finsi
   testerEtAvancer("si");
   testerEtAvancer("(");
   Noeud* condition = expression(); // On mémorise la condition
   testerEtAvancer(")");
   Noeud* sequence = seqInst();     // On mémorise la séquence d'instruction
+  NoeudInstSi * instSi = new NoeudInstSi(condition,sequence);
+  while(m_lecteur.getSymbole() != "finsi"){
+	  if(m_lecteur.getSymbole()=="sinonsi"){
+		  testerEtAvancer("sinonsi");
+		  testerEtAvancer("(");
+		  Noeud* condition = expression();
+		  testerEtAvancer(")");
+		  Noeud* sequence = seqInst();
+		  instSi->ajouterSinonsi(new NoeudInstSinonsi(condition,sequence));
+	  } else if(m_lecteur.getSymbole()=="sinon"){
+		  testerEtAvancer("sinon");
+		  Noeud* sequence = seqInst();
+		  instSi->ajouterSinon(sequence);
+	  } else {
+		  throw new SyntaxeException("Erreur : Sinonsi, sinon attendu");
+	  }
+  }
   testerEtAvancer("finsi");
-  return new NoeudInstSi(condition, sequence); // Et on renvoie un noeud Instruction Si
+  return instSi;
 }
 
 Noeud* Interpreteur::instTantQue() {
@@ -160,7 +177,13 @@ Noeud* Interpreteur::instTantQue() {
 
 Noeud* Interpreteur::instRepeter() {
 	// <instRepeter> ::= repeter <seqInst> jusqua ( <expression> )
-	return nullptr;
+	testerEtAvancer("repeter");
+	Noeud* sequence = seqInst();
+	testerEtAvancer("jusqua");
+	testerEtAvancer("(");
+	Noeud* condition = expression();// On mémorise la condition
+	testerEtAvancer(")");
+	return new NoeudInstRepeter(condition,sequence);
 }
 
 Noeud* Interpreteur::instPour() {
