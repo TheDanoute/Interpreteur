@@ -1,6 +1,7 @@
 #include "Interpreteur.h"
 #include <stdlib.h>
 #include <iostream>
+#include <sstream>
 using namespace std;
 
 Interpreteur::Interpreteur(ifstream & fichier) :
@@ -212,12 +213,36 @@ Noeud* Interpreteur::instPour() {
 
 Noeud* Interpreteur::instEcrire() {
 	// <instEcrire> ::= ecrire ( <expression> | <chaine> | { , <expression> | <chaine> } )
-	return nullptr;
+	testerEtAvancer("ecrire");
+	testerEtAvancer("(");
+	ostringstream final;
+	while(m_lecteur.getSymbole()!=")"){
+		if(m_lecteur.getSymbole()=="<CHAINE>"){
+			final << m_lecteur.getSymbole().getChaine();
+		} else if (m_lecteur.getSymbole()!=","){
+			Noeud* valeur = expression();
+			final << valeur->executer();
+		}
+		m_lecteur.avancer();
+	}
+	testerEtAvancer(")");
+	return new NoeudInstEcrire(final.str());
 }
 
 Noeud* Interpreteur::instLire() {
 	//  <instLire> ::= lire ( <variable> { , <variable> } )
-	return nullptr;
+	testerEtAvancer("lire");
+	testerEtAvancer("(");
+	NoeudInstLire* instLire = new NoeudInstLire;
+	while(m_lecteur.getSymbole()!=")"){
+		if(m_lecteur.getSymbole()=="<VARIABLE>"){
+			Noeud* var = m_table.chercheAjoute(m_lecteur.getSymbole());
+			instLire->ajouter(var);
+		}
+		m_lecteur.avancer();
+	}
+	testerEtAvancer(")");
+	return instLire;
 }
 
 

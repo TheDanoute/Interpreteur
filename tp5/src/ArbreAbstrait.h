@@ -145,5 +145,32 @@ private:
 	Noeud* m_sequence;
 };
 
+class NoeudInstEcrire : public Noeud {
+// Classe pour représenter un noeud "instruction tantque"
+// et ses 2 fils : la condition du tanque et la séquence d'instruction associée
+public:
+	NoeudInstEcrire(string value);
+	// Construit une "instruction tantque" avec sa condition et sa séquence d'instruction
+	~NoeudInstEcrire() {}// A cause du destructeur virtuel de la classe Noeud
+	int executer(); // Exécute l'instruction tantque : si condition vraie on exécute la séquence
+
+private:
+	string value;
+};
+
+class NoeudInstLire : public Noeud {
+// Classe pour représenter un noeud "instruction tantque"
+// et ses 2 fils : la condition du tanque et la séquence d'instruction associée
+public:
+	NoeudInstLire();
+	// Construit une "instruction tantque" avec sa condition et sa séquence d'instruction
+	~NoeudInstLire() {}// A cause du destructeur virtuel de la classe Noeud
+	void ajouter(Noeud* variable);
+	int executer(); // Exécute l'instruction tantque : si condition vraie on exécute la séquence
+
+private:
+	vector<Noeud*>m_variables;
+};
+
 
 #endif /* ARBREABSTRAIT_H */

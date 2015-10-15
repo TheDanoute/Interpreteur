@@ -144,6 +144,30 @@ int NoeudInstRepeter::executer() {
 	do {
 		m_sequence->executer();
 	}
-	while (m_condition->executer());
+	while (!m_condition->executer());
 	return 0; // La valeur renvoyée ne représente rien !
+}
+
+NoeudInstEcrire::NoeudInstEcrire(string value)
+: value(value) {
+}
+
+int NoeudInstEcrire::executer(){
+	cout << value;
+	return 0;
+}
+
+NoeudInstLire::NoeudInstLire(){
+}
+
+void NoeudInstLire::ajouter(Noeud* variable){
+	m_variables.push_back(variable);
+}
+int NoeudInstLire::executer(){
+	for(auto variable : m_variables){
+		int temp;
+		cin >> temp;
+		((SymboleValue*) variable)->setValeur(temp);
+	}
+	return 0;
 }
