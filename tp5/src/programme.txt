@@ -3,5 +3,4 @@
 procedure principale()
 i=12;
 ecrire("Bonjour")
-finproc
 # Commentaire Final

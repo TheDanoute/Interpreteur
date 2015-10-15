@@ -118,14 +118,18 @@ NoeudInstTantQue::NoeudInstTantQue(Noeud* condition, Noeud* sequence)
 : m_condition(condition), m_sequence(sequence) {
 }
 
-NoeudInstPour::NoeudInstPour(Noeud* condition, Noeud* sequence, Noeud* affect, Noeud* affect2)
-: m_condition(condition), m_sequence(sequence), m_affect(affect), m_affect2(affect2) {
-
-}
-
 int NoeudInstTantQue::executer() {
 	while (m_condition->executer()) m_sequence->executer();
 	return 0; // La valeur renvoyée ne représente rien !
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// NoeudInstPour
+////////////////////////////////////////////////////////////////////////////////
+
+NoeudInstPour::NoeudInstPour(Noeud* condition, Noeud* sequence, Noeud* affect, Noeud* affect2)
+: m_condition(condition), m_sequence(sequence), m_affect(affect), m_affect2(affect2) {
+
 }
 
 int NoeudInstPour::executer() {
@@ -136,6 +140,11 @@ int NoeudInstPour::executer() {
 	}
 	return 0; // La valeur renvoyée ne représente rien !
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// NoeudInstRepeter
+////////////////////////////////////////////////////////////////////////////////
+
 NoeudInstRepeter::NoeudInstRepeter(Noeud* condition, Noeud* sequence)
 : m_condition(condition), m_sequence(sequence) {
 }
@@ -148,6 +157,10 @@ int NoeudInstRepeter::executer() {
 	return 0; // La valeur renvoyée ne représente rien !
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// NoeudInstEcrire
+////////////////////////////////////////////////////////////////////////////////
+
 NoeudInstEcrire::NoeudInstEcrire(string value)
 : value(value) {
 }
@@ -156,6 +169,10 @@ int NoeudInstEcrire::executer(){
 	cout << value;
 	return 0;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// NoeudInstLire
+////////////////////////////////////////////////////////////////////////////////
 
 NoeudInstLire::NoeudInstLire(){
 }
