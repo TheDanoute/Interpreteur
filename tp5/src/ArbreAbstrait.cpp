@@ -134,9 +134,11 @@ NoeudInstPour::NoeudInstPour(Noeud* condition, Noeud* sequence, Noeud* affect, N
 }
 
 int NoeudInstPour::executer() {
-	m_affect->executer();
+	if (m_affect!=nullptr)
+		m_affect->executer();
 	while (m_condition->executer()) {
 		m_sequence->executer();
+	if(m_affect2!=nullptr)
 		m_affect2->executer();
 	}
 	return 0; // La valeur renvoyée ne représente rien !

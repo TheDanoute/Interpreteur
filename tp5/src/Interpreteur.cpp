@@ -188,19 +188,20 @@ Noeud* Interpreteur::instRepeter() {
 }
 
 Noeud* Interpreteur::instPour() {
-	// <instPour> ::= pour ( [ <affectation> ] ) ; <expression> ; ( [ <affectation> ] ) <seqInst>	 finpour
+	// <instPour> ::= pour ( [ 	<affectation> 	]	 ;	 <expression> 	;	[ 	<affectation> 	]	) <seqInst>	 finpour
 	testerEtAvancer("pour");
 	testerEtAvancer("(");
 	Noeud * affect = nullptr;
-	if(m_lecteur.getSymbole()=="<VARIABLE>") {
+	cout << m_lecteur.getSymbole().getChaine();
+	if(m_lecteur.getSymbole()!=";")
 		Noeud* affect = affectation();	// On mémorise l'affectation s'il y en a une
-	}
+	testerEtAvancer(";");
 	Noeud* condition = expression();	// On mémorise la condition
-	testerEtAvancer(")");
+	testerEtAvancer(";");
 	Noeud* affect2 = nullptr;
-	if(m_lecteur.getSymbole()=="<VARIABLE>") {
+	if(m_lecteur.getSymbole()!=")")
 		Noeud* affect2 = affectation();	// On mémorise l'affectation2 s'il y en a une
-	}
+	testerEtAvancer(")");
 	Noeud* sequence = seqInst();		// On mémorise la séquence d'instruction
 	testerEtAvancer("finpour");
 	if(affect==nullptr && affect2==nullptr)
