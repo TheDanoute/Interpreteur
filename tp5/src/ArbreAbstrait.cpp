@@ -3,6 +3,7 @@
 #include "Symbole.h"
 #include "SymboleValue.h"
 #include "Exceptions.h"
+#include <typeinfo>
 
 ////////////////////////////////////////////////////////////////////////////////
 // NoeudSeqInst
@@ -161,12 +162,21 @@ int NoeudInstRepeter::executer() {
 // NoeudInstEcrire
 ////////////////////////////////////////////////////////////////////////////////
 
-NoeudInstEcrire::NoeudInstEcrire(string value)
-: value(value) {
+NoeudInstEcrire::NoeudInstEcrire(){
+}
+
+void NoeudInstEcrire::ajouterNoeud(Noeud* variable){
+	m_elements.push_back(variable);
 }
 
 int NoeudInstEcrire::executer(){
-	cout << value;
+	for(auto elem : m_elements){
+		if(typeid(*elem)==typeid(NoeudChaine)){
+			elem->executer();
+		} else {
+			cout << elem->executer();
+		}
+	}
 	return 0;
 }
 
@@ -186,5 +196,13 @@ int NoeudInstLire::executer(){
 		cin >> temp;
 		((SymboleValue*) variable)->setValeur(temp);
 	}
+	return 0;
+}
+NoeudChaine::NoeudChaine(string chaine) :
+		m_chaine(chaine){
+}
+
+int NoeudChaine::executer(){
+	cout << m_chaine;// Exécute l'instruction tantque : si condition vraie on exécute la séquence
 	return 0;
 }

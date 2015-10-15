@@ -215,18 +215,20 @@ Noeud* Interpreteur::instEcrire() {
 	// <instEcrire> ::= ecrire ( <expression> | <chaine> | { , <expression> | <chaine> } )
 	testerEtAvancer("ecrire");
 	testerEtAvancer("(");
-	ostringstream final;
+	NoeudInstEcrire * final = new NoeudInstEcrire;
 	while(m_lecteur.getSymbole()!=")"){
 		if(m_lecteur.getSymbole()=="<CHAINE>"){
-			final << m_lecteur.getSymbole().getChaine();
+			final->ajouterNoeud(new NoeudChaine(m_lecteur.getSymbole().getChaine()));
+			m_lecteur.avancer();
 		} else if (m_lecteur.getSymbole()!=","){
 			Noeud* valeur = expression();
-			final << valeur->executer();
+			final->ajouterNoeud(valeur);
+		} else {
+			m_lecteur.avancer();
 		}
-		m_lecteur.avancer();
 	}
 	testerEtAvancer(")");
-	return new NoeudInstEcrire(final.str());
+	return final;
 }
 
 Noeud* Interpreteur::instLire() {

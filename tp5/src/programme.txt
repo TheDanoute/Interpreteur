@@ -2,5 +2,6 @@
 # Les lignes de commentaires commencent par #
 procedure principale()
 i=12;
-ecrire("Bonjour")
+ecrire(i+1,"Bonjour")
+finproc
 # Commentaire Final

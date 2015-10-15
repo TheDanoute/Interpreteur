@@ -149,13 +149,14 @@ class NoeudInstEcrire : public Noeud {
 // Classe pour représenter un noeud "instruction tantque"
 // et ses 2 fils : la condition du tanque et la séquence d'instruction associée
 public:
-	NoeudInstEcrire(string value);
+	NoeudInstEcrire();
 	// Construit une "instruction tantque" avec sa condition et sa séquence d'instruction
 	~NoeudInstEcrire() {}// A cause du destructeur virtuel de la classe Noeud
+	void ajouterNoeud(Noeud * n);
 	int executer(); // Exécute l'instruction tantque : si condition vraie on exécute la séquence
 
 private:
-	string value;
+	vector<Noeud *>m_elements;
 };
 
 class NoeudInstLire : public Noeud {
@@ -170,6 +171,17 @@ public:
 
 private:
 	vector<Noeud*>m_variables;
+};
+
+class NoeudChaine : public Noeud {
+public:
+	NoeudChaine(string chaine);
+	// Construit une "instruction tantque" avec sa condition et sa séquence d'instruction
+	~NoeudChaine() {}// A cause du destructeur virtuel de la classe Noeud
+	int executer(); // Exécute l'instruction tantque : si condition vraie on exécute la séquence
+
+private:
+	string m_chaine;
 };
 
 
