@@ -2,8 +2,8 @@
 # Les lignes de commentaires commencent par #
 procedure principale()
 i=0;
-pour(;i<20;)
+tantque(i<20)
 i=i+1;
-finpour
+fintantque
 finproc
 # Commentaire Final

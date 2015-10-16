@@ -65,6 +65,7 @@ Noeud* Interpreteur::seqInst() {
 
 Noeud* Interpreteur::inst() {
   // <inst> ::= <affectation>  ; | <instSi>
+  try {
   if (m_lecteur.getSymbole() == "<VARIABLE>") {
     Noeud *affect = affectation();
     testerEtAvancer(";");
@@ -72,7 +73,6 @@ Noeud* Interpreteur::inst() {
   }
   else if (m_lecteur.getSymbole() == "si")
 	  return instSi();
-  // Compléter les alternatives chaque fois qu'on rajoute une nouvelle instruction
   else if (m_lecteur.getSymbole() == "tantque")
 	  return instTantQue();
   else if (m_lecteur.getSymbole() == "repeter")
@@ -84,6 +84,29 @@ Noeud* Interpreteur::inst() {
   else if (m_lecteur.getSymbole() == "lire")
   	  return instLire();
   else erreur("Instruction incorrecte");
+} catch (SyntaxeException & e) {
+	cout << e.what() << endl;
+	m_lecteur.avancer();
+	m_arbre==nullptr;
+	if (m_lecteur.getSymbole() == "<VARIABLE>") {
+	    Noeud *affect = affectation();
+	    testerEtAvancer(";");
+	    return affect;
+	  }
+	  else if (m_lecteur.getSymbole() == "si")
+		  return instSi();
+	  else if (m_lecteur.getSymbole() == "tantque")
+		  return instTantQue();
+	  else if (m_lecteur.getSymbole() == "repeter")
+	  	  return instRepeter();
+	  else if (m_lecteur.getSymbole() == "pour")
+	  	  return instPour();
+	  else if (m_lecteur.getSymbole() == "ecrire")
+	  	  return instEcrire();
+	  else if (m_lecteur.getSymbole() == "lire")
+	  	  return instLire();
+	  else erreur("Instruction incorrecte");
+}
 }
 
 Noeud* Interpreteur::affectation() {
