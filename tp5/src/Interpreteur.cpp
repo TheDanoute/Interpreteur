@@ -192,7 +192,7 @@ Noeud* Interpreteur::instPour() {
 	testerEtAvancer("pour");
 	testerEtAvancer("(");
 	Noeud * affect = nullptr;
-	cout << m_lecteur.getSymbole().getChaine();
+	cout << m_lecteur.getSymbole();
 	if(m_lecteur.getSymbole()!=";")
 		Noeud* affect = affectation();	// On mémorise l'affectation s'il y en a une
 	testerEtAvancer(";");

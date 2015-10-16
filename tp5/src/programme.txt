@@ -1,7 +1,8 @@
 # Fichier de test
 # Les lignes de commentaires commencent par #
 procedure principale()
-pour(i=0;i<20;)
+i=0;
+pour(;i<20;)
 i=i+1;
 finpour
 finproc
