@@ -1,9 +1,24 @@
 # Fichier de test
 # Les lignes de commentaires commencent par #
 procedure principale()
-i=0;
+lire(i)
 tantque(i<20)
+si(i<10)
+ecrire("i=",i," inferieur a 10")
+sinonsi(i==10)
+ecrire("i egal a 10")
+sinon
+ecrire(i)
+finsi
 i=i+1;
 fintantque
+j=0;
+pour(;j<10;j=j+1)
+ecrire("ok")
+finpour
+repeter
+ecrire("allo")
+i=i+1;
+jusqua(i>29)
 finproc
 # Commentaire Final

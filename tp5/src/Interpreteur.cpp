@@ -88,24 +88,6 @@ Noeud* Interpreteur::inst() {
 	cout << e.what() << endl;
 	m_lecteur.avancer();
 	m_arbre==nullptr;
-	if (m_lecteur.getSymbole() == "<VARIABLE>") {
-	    Noeud *affect = affectation();
-	    testerEtAvancer(";");
-	    return affect;
-	  }
-	  else if (m_lecteur.getSymbole() == "si")
-		  return instSi();
-	  else if (m_lecteur.getSymbole() == "tantque")
-		  return instTantQue();
-	  else if (m_lecteur.getSymbole() == "repeter")
-	  	  return instRepeter();
-	  else if (m_lecteur.getSymbole() == "pour")
-	  	  return instPour();
-	  else if (m_lecteur.getSymbole() == "ecrire")
-	  	  return instEcrire();
-	  else if (m_lecteur.getSymbole() == "lire")
-	  	  return instLire();
-	  else erreur("Instruction incorrecte");
 }
 }
 
@@ -217,23 +199,18 @@ Noeud* Interpreteur::instPour() {
 	Noeud * affect = nullptr;
 	cout << m_lecteur.getSymbole();
 	if(m_lecteur.getSymbole()!=";")
-		Noeud* affect = affectation();	// On mémorise l'affectation s'il y en a une
+		affect = affectation();	// On mémorise l'affectation s'il y en a une
 	testerEtAvancer(";");
 	Noeud* condition = expression();	// On mémorise la condition
 	testerEtAvancer(";");
 	Noeud* affect2 = nullptr;
 	if(m_lecteur.getSymbole()!=")")
-		Noeud* affect2 = affectation();	// On mémorise l'affectation2 s'il y en a une
+		affect2 = affectation();	// On mémorise l'affectation2 s'il y en a une
 	testerEtAvancer(")");
 	Noeud* sequence = seqInst();		// On mémorise la séquence d'instruction
 	testerEtAvancer("finpour");
-	if(affect==nullptr && affect2==nullptr)
-		return new NoeudInstPour(condition,sequence);
-	else if(affect!=nullptr && affect2==nullptr)
-		return new NoeudInstPour(condition,sequence,affect);
-	else if(affect==nullptr && affect2!=nullptr)
-		return new NoeudInstPour(condition,sequence,nullptr,affect2);
-	}
+	return new NoeudInstPour(condition,sequence,affect,affect2);
+}
 
 Noeud* Interpreteur::instEcrire() {
 	// <instEcrire> ::= ecrire ( <expression> | <chaine> | { , <expression> | <chaine> } )
@@ -269,6 +246,16 @@ Noeud* Interpreteur::instLire() {
 	}
 	testerEtAvancer(")");
 	return instLire;
+}
+
+void Interpreteur::traduitEnCPP(ostream & cout, unsigned int indentation) const {
+	cout << setw(4*indentation) << "" << "int main() {" << endl; // Début d'un programme C++
+	// Ecrire en C++ la déclaration des variables présentes dans le programme...
+	// ... variables dont on retrouvera la nom en parcourant la table des symboles !
+	// Par exemple, si le programme contient i,j,k, il faudra écrire : int i; int j; int k; ...
+	getArbre()->traduitEnCPP(cout, indentation+1); // lance l'opération traduitEnCPP sur la racine
+	cout << setw(4*(indentation+1))<< ""<< "return 0;" << endl;
+	cout << setw(4*indentation) << "" << "}" << endl; // Fin d'un programme C++
 }
 
 
