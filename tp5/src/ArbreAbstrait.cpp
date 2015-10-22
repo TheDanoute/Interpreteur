@@ -6,6 +6,29 @@
 #include <typeinfo>
 
 ////////////////////////////////////////////////////////////////////////////////
+// NoeudProcedure
+////////////////////////////////////////////////////////////////////////////////
+NoeudProcedures::NoeudProcedures() :
+	m_procedurePrincipale(nullptr),m_procedures(){
+}
+
+void NoeudProcedures::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
+	fichier << setw(indentation*4) << "" << "int main() {" << endl; // Début d'un programme C++
+	m_procedurePrincipale->traduitEnCPP(fichier,indentation+1);
+	fichier << setw(4*(indentation+1))<< ""<< "return 0;" << endl;
+	fichier << setw(indentation*4) << "" << "}" << endl; // Fin d'un programme C++
+}
+void NoeudProcedures::ajoute(string nom,Noeud * procedure){
+	m_procedures[nom]=procedure;
+}
+void NoeudProcedures::procedurePrincipale(Noeud * procedure){
+	m_procedurePrincipale = procedure;
+}
+int NoeudProcedures::executer(){
+	m_procedurePrincipale->executer();
+	return 0;
+}
+////////////////////////////////////////////////////////////////////////////////
 // NoeudSeqInst
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -22,10 +45,9 @@ void NoeudSeqInst::ajoute(Noeud* instruction) {
   if (instruction!=nullptr) m_instructions.push_back(instruction);
 }
 
-void NoeudSeqInst::traduitEnCPP(ostream & cout,unsigned int indentation)const{
+void NoeudSeqInst::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
 	for (unsigned int i = 0; i < m_instructions.size(); i++){
-		cout << setw(4*indentation) << "";
-	    m_instructions[i]->traduitEnCPP(cout,indentation);
+	    m_instructions[i]->traduitEnCPP(fichier,indentation);
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -42,13 +64,22 @@ int NoeudAffectation::executer() {
   return 0; // La valeur renvoyée ne représente rien !
 }
 
-void NoeudAffectation::traduitEnCPP(ostream & cout,unsigned int indentation)const{
+void NoeudAffectation::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
+	fichier << setw(indentation*4) << "";
 	if(!((SymboleValue *)m_variable)->setDefiniTCPP())
-		cout << "int ";
-	m_variable->traduitEnCPP(cout,indentation);
-	cout << "=";
-	m_expression->traduitEnCPP(cout,indentation);
-	cout << ";" << endl;
+		fichier <<"int ";
+	m_variable->traduitEnCPP(fichier,indentation);
+	fichier << "=";
+	m_expression->traduitEnCPP(fichier,indentation);
+	fichier << ";" << endl;
+}
+
+void NoeudAffectation::traduitEnCPPFor(ofstream & fichier,unsigned int indentation)const{
+	if(!((SymboleValue *)m_variable)->setDefiniTCPP())
+		fichier <<"int ";
+	m_variable->traduitEnCPP(fichier,indentation);
+	fichier << "=";
+	m_expression->traduitEnCPP(fichier,indentation);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -83,12 +114,12 @@ int NoeudOperateurBinaire::executer() {
   return valeur; // On retourne la valeur calculée
 }
 
-void NoeudOperateurBinaire::traduitEnCPP(ostream & cout,unsigned int indentation)const{
+void NoeudOperateurBinaire::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
 	if (m_operandeGauche != nullptr)
-		m_operandeGauche->traduitEnCPP(cout,indentation);
-	cout << m_operateur.getChaine();
+		m_operandeGauche->traduitEnCPP(fichier,indentation);
+	fichier << m_operateur.getChaine();
 	if (m_operandeDroit != nullptr)
-		m_operandeDroit->traduitEnCPP(cout,indentation);
+		m_operandeDroit->traduitEnCPP(fichier,indentation);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -108,12 +139,12 @@ int NoeudInstSinonsi::executer(){
 	return final;
 }
 
-void NoeudInstSinonsi::traduitEnCPP(ostream & cout,unsigned int indentation)const{
-	cout << "else if ( " ;
-	m_condition->traduitEnCPP(cout,indentation);
-	cout << " ) {" << endl;
-	m_sequence->traduitEnCPP(cout,indentation+1);
-	cout << setw(4*indentation) << "" << "} " ;
+void NoeudInstSinonsi::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
+	fichier << "else if ( " ;
+	m_condition->traduitEnCPP(fichier,indentation);
+	fichier << " ) {" << endl;
+	m_sequence->traduitEnCPP(fichier,indentation+1);
+	fichier << setw(indentation*4) << "" << "} " ;
 }
 
 NoeudInstSi::NoeudInstSi(Noeud* condition, Noeud* sequence)
@@ -142,19 +173,19 @@ int NoeudInstSi::executer() {
   return 0; // La valeur renvoyée ne représente rien !
 }
 
-void NoeudInstSi::traduitEnCPP(ostream & cout,unsigned int indentation)const{
-	cout << setw(4*indentation) << "" << "if (";
-	m_condition->traduitEnCPP(cout,indentation);
-	cout << ") {" << endl;
-	m_sequence->traduitEnCPP(cout,indentation+1);
-	cout << setw(4*indentation) << "" << "} " ;
+void NoeudInstSi::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
+	fichier << setw(indentation*4) << "" << "if (";
+	m_condition->traduitEnCPP(fichier,indentation);
+	fichier << ") {" << endl;
+	m_sequence->traduitEnCPP(fichier,indentation+1);
+	fichier << setw(indentation*4) << "" << "} " ;
 	if (m_sinonsi.size()!=0)
 		for(auto instSinonSi : m_sinonsi)
-			instSinonSi->traduitEnCPP(cout,indentation);
+			instSinonSi->traduitEnCPP(fichier,indentation);
 	if (m_sinon!=nullptr){
-		cout << "else {" << endl;
-		m_sinon->traduitEnCPP(cout,indentation+1);
-		cout << setw(4*indentation) << "" <<"}" << endl;
+		fichier << "else {" << endl;
+		m_sinon->traduitEnCPP(fichier,indentation+1);
+		fichier << setw(indentation*4) << "" <<"}" << endl;
 	}
 }
 ////////////////////////////////////////////////////////////////////////////////
@@ -170,12 +201,12 @@ int NoeudInstTantQue::executer() {
 	return 0; // La valeur renvoyée ne représente rien !
 }
 
-void NoeudInstTantQue::traduitEnCPP(ostream & cout,unsigned int indentation)const{
-	cout << setw(4*indentation) << "" << "while (" ;
-	m_condition->traduitEnCPP(cout,indentation);
-	cout << ") {" << endl;
-	m_sequence->traduitEnCPP(cout,indentation+1);
-	cout << setw(4*indentation) << "" << "}" << endl;
+void NoeudInstTantQue::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
+	fichier << setw(indentation*4) << "" << "while (" ;
+	m_condition->traduitEnCPP(fichier,indentation);
+	fichier << ") {" << endl;
+	m_sequence->traduitEnCPP(fichier,indentation+1);
+	fichier << setw(indentation*4) << "" << "}" << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
 // NoeudInstPour
@@ -197,18 +228,18 @@ int NoeudInstPour::executer() {
 	return 0; // La valeur renvoyée ne représente rien !
 }
 
-void NoeudInstPour::traduitEnCPP(ostream & cout,unsigned int indentation)const{
-	cout << setw(4*indentation) << "" << "for( ";
+void NoeudInstPour::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
+	fichier << setw(indentation*4) << "" << "for(";
 	if (m_affect!=nullptr)
-		m_affect->traduitEnCPP(cout,indentation);
-	cout << ";" ;
-	m_condition->traduitEnCPP(cout,indentation);
-	cout << ";" ;
+		((NoeudAffectation *)m_affect)->traduitEnCPPFor(fichier,indentation);
+	fichier << ";" ;
+	m_condition->traduitEnCPP(fichier,indentation);
+	fichier << ";" ;
 	if(m_affect2!=nullptr)
-		m_affect2->traduitEnCPP(cout,indentation);
-	cout << ") {" << endl;
-	m_sequence->traduitEnCPP(cout,indentation);
-	cout << setw(4*indentation) << "" << "}" << endl;
+		((NoeudAffectation *)m_affect2)->traduitEnCPPFor(fichier,indentation);
+	fichier << ") {" << endl;
+	m_sequence->traduitEnCPP(fichier,indentation+1);
+	fichier << setw(indentation*4) << "" << "}" << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
 // NoeudInstRepeter
@@ -221,17 +252,16 @@ NoeudInstRepeter::NoeudInstRepeter(Noeud* condition, Noeud* sequence)
 int NoeudInstRepeter::executer() {
 	do {
 		m_sequence->executer();
-	}
-	while (!m_condition->executer());
+	} while (!m_condition->executer());
 	return 0; // La valeur renvoyée ne représente rien !
 }
 
-void  NoeudInstRepeter::traduitEnCPP(ostream & cout,unsigned int indentation)const{
-	cout << setw(4*indentation) << "" << "do {" << endl;
-	m_sequence->traduitEnCPP(cout,indentation);
-	cout << setw(4*indentation) << "" << "}" << endl << setw(4*indentation) << "while (!( ";
-	m_condition->traduitEnCPP(cout,indentation);
-	cout << " ));" << endl << setw(4*indentation) << "" << "}" << endl;
+void  NoeudInstRepeter::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
+	fichier << setw(indentation*4) << "" << "do {" << endl;
+	m_sequence->traduitEnCPP(fichier,indentation+1);
+	fichier << setw(indentation*4) << "" << "} while (!( ";
+	m_condition->traduitEnCPP(fichier,indentation);
+	fichier << " ));" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -256,13 +286,13 @@ int NoeudInstEcrire::executer(){
 	return 0;
 }
 
-void NoeudInstEcrire::traduitEnCPP(ostream & cout,unsigned int indentation)const{
-	cout << setw(4*indentation) << "" << "cout";
+void NoeudInstEcrire::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
+	fichier << setw(indentation*4) << "" << "cout";
 	for(auto elem : m_elements){
-		cout << " << " ;
-		elem->traduitEnCPP(cout,indentation);
+		fichier << " << " ;
+		elem->traduitEnCPP(fichier,indentation);
 	}
-	cout << " ;" << endl;
+	fichier << " ;" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -284,25 +314,21 @@ int NoeudInstLire::executer(){
 	return 0;
 }
 
-void NoeudInstLire::traduitEnCPP(ostream & cout,unsigned int indentation)const{
+void NoeudInstLire::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
 	for(auto variable : m_variables){
 		if(!((SymboleValue *)variable)->setDefiniTCPP())
-			cout << "int " << ((SymboleValue *)variable)->getChaine() << ";" << endl ;
+			fichier << setw(indentation*4) << ""<< "int " << ((SymboleValue *)variable)->getChaine() << ";" << endl ;
 	}
-	cout << setw(4*indentation) << "" <<"cin";
+	fichier << setw(indentation*4) << "" <<"cin";
 	for(auto variable : m_variables){
-		cout << " >> ";
-		variable->traduitEnCPP(cout,indentation);
+		fichier << " >> ";
+		variable->traduitEnCPP(fichier,indentation);
 	}
-	cout << " ;" << endl;
+	fichier << " ;" << endl;
 }
 
-NoeudChaine::NoeudChaine(string chaine) {
-	if(chaine!="finligne"){
-		chaine.erase(chaine.begin());
-		chaine.erase(chaine.end()-1);
-	}
-	m_chaine=chaine;
+NoeudChaine::NoeudChaine(string chaine) :
+		m_chaine(chaine){
 }
 
 int NoeudChaine::executer(){
@@ -312,8 +338,8 @@ int NoeudChaine::executer(){
 	return 0;
 }
 
-void NoeudChaine::traduitEnCPP(ostream & cout,unsigned int indentation)const{
+void NoeudChaine::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
 	if (m_chaine=="finligne")
-		cout << "endl";
-	else cout << m_chaine ;
+		fichier << "endl";
+	else fichier << m_chaine ;
 }

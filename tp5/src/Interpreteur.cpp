@@ -42,14 +42,26 @@ void Interpreteur::erreur(const string & message) const throw (SyntaxeException)
 
 Noeud* Interpreteur::programme() {
   // <programme> ::= procedure principale() <seqInst> finproc FIN_FICHIER
-  testerEtAvancer("procedure");
-  testerEtAvancer("principale");
-  testerEtAvancer("(");
-  testerEtAvancer(")");
-  Noeud* sequence = seqInst();
-  testerEtAvancer("finproc");
+	NoeudProcedures * programme = new NoeudProcedures;
+	m_listProc = programme->getPointer();
+	while(m_lecteur.getSymbole()!="<FINDEFICHIER>"){
+		testerEtAvancer("procedure");
+	  if(m_lecteur.getSymbole()=="principale"){
+		  testerEtAvancer("principale");
+		  testerEtAvancer("(");
+		  testerEtAvancer(")");
+		  programme->procedurePrincipale(seqInst());
+	  } else {
+		  string nom = m_lecteur.getSymbole().getChaine();
+		  m_lecteur.avancer();
+		  testerEtAvancer("(");
+		  testerEtAvancer(")");
+		  programme->ajoute(nom,seqInst());
+	  }
+	  testerEtAvancer("finproc");
+  }
   tester("<FINDEFICHIER>");
-  return sequence;
+  return programme;
 }
 
 Noeud* Interpreteur::seqInst() {
@@ -57,7 +69,7 @@ Noeud* Interpreteur::seqInst() {
   NoeudSeqInst* sequence = new NoeudSeqInst();
   do {
     sequence->ajoute(inst());
-  } while (m_lecteur.getSymbole() == "<VARIABLE>" || m_lecteur.getSymbole() == "si" || m_lecteur.getSymbole() == "tantque" || m_lecteur.getSymbole() == "repeter" || m_lecteur.getSymbole() == "pour" || m_lecteur.getSymbole() == "ecrire" || m_lecteur.getSymbole() == "lire");
+  } while (m_lecteur.getSymbole() == "<VARIABLE>" || m_lecteur.getSymbole() == "si" || m_lecteur.getSymbole() == "tantque" || m_lecteur.getSymbole() == "repeter" || m_lecteur.getSymbole() == "pour" || m_lecteur.getSymbole() == "ecrire" || m_lecteur.getSymbole() == "lire" || m_lecteur.getSymbole() == "appel");
   // Tant que le symbole courant est un début possible d'instruction...
   // Il faut compléter cette condition chaque fois qu'on rajoute une nouvelle instruction
   return sequence;
@@ -83,6 +95,8 @@ Noeud* Interpreteur::inst() {
   	  return instEcrire();
   else if (m_lecteur.getSymbole() == "lire")
   	  return instLire();
+  else if(m_lecteur.getSymbole()=="appel")
+  	  return instProcedure();
   else erreur("Instruction incorrecte");
 } catch (SyntaxeException & e) {
 	cout << e. what() << endl;
@@ -93,14 +107,33 @@ Noeud* Interpreteur::inst() {
 }
 }
 
+Noeud* Interpreteur::instProcedure(){
+	testerEtAvancer("appel");
+	Noeud* proc =  (*m_listProc)[m_lecteur.getSymbole().getChaine()];
+	m_lecteur.avancer();
+	testerEtAvancer("(");
+	testerEtAvancer(")");
+	return proc;
+}
+
 Noeud* Interpreteur::affectation() {
   // <affectation> ::= <variable> = <expression> 
   tester("<VARIABLE>");
   Noeud* var = m_table.chercheAjoute(m_lecteur.getSymbole()); // La variable est ajoutée à la table eton la mémorise
   m_lecteur.avancer();
-  testerEtAvancer("=");
-  Noeud* exp = expression();             // On mémorise l'expression trouvée
-  return new NoeudAffectation(var, exp); // On renvoie un noeud affectation
+  if(m_lecteur.getSymbole()=="="){
+	  testerEtAvancer("=");
+	  Noeud* exp = expression();             // On mémorise l'expression trouvée
+	  return new NoeudAffectation(var, exp); // On renvoie un noeud affectation
+  }else if (m_lecteur.getSymbole()=="++"){
+	  m_lecteur.avancer();
+	  Noeud* fact = m_table.chercheAjoute(Symbole("1"));
+	  return new NoeudAffectation(var,new NoeudOperateurBinaire(Symbole("+"),var,fact));
+  }else if(m_lecteur.getSymbole()=="--"){
+	  m_lecteur.avancer();
+	  Noeud* fact = m_table.chercheAjoute(Symbole("1"));
+	  return new NoeudAffectation(var,new NoeudOperateurBinaire(Symbole("-"),var,fact));
+  }
 }
 
 
@@ -169,7 +202,6 @@ Noeud* Interpreteur::expression() {
 
 Noeud* Interpreteur::facteur() {
   // <facteur> ::= <entier> | <variable> | - <expBool> | non <expBool> | ( <expBool>)
-  // avant <facteur> ::= <entier> | <variable> | - <facteur> | non <facteur> | ( <expression> )
   Noeud* fact = nullptr;
   if (m_lecteur.getSymbole() == "<VARIABLE>" || m_lecteur.getSymbole() == "<ENTIER>") {
     fact = m_table.chercheAjoute(m_lecteur.getSymbole()); // on ajoute la variable ou l'entier à la table
@@ -346,14 +378,11 @@ Noeud* Interpreteur::instLire() {
 		m_arbre=nullptr;
 	}
 }
-void Interpreteur::traduitEnCPP(ostream & cout, unsigned int indentation) const {
-	cout << setw(4*indentation) << "" << "int main() {" << endl; // Début d'un programme C++
-	// Ecrire en C++ la déclaration des variables présentes dans le programme...
-	// ... variables dont on retrouvera la nom en parcourant la table des symboles !
-	// Par exemple, si le programme contient i,j,k, il faudra écrire : int i; int j; int k; ...
-	getArbre()->traduitEnCPP(cout, indentation+1); // lance l'opération traduitEnCPP sur la racine
-	cout << setw(4*(indentation+1))<< ""<< "return 0;" << endl;
-	cout << setw(4*indentation) << "" << "}" << endl; // Fin d'un programme C++
+void Interpreteur::traduitEnCPP(ofstream & fichier, unsigned int indentation) const {
+	fichier <<"/****    FICHER GENERE AUTOMATIQUEMENT    ****/"<<endl<<endl;
+	fichier << "#include <iostream>" << endl << "using namespace std;" << endl << endl;
+	getArbre()->traduitEnCPP(fichier, indentation+1); // lance l'opération traduitEnCPP sur la racine
+	fichier << endl <<"/****    FIN FICHER    ****/" << endl;
 }
 
 

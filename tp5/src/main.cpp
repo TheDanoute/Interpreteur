@@ -16,7 +16,6 @@ int main(int argc, char* argv[]) {
     Interpreteur interpreteur(fichier);
     interpreteur.analyse();
     // Si pas d'exception levée, l'analyse syntaxique a réussi
-    interpreteur.traduitEnCPP(cout,0);
     cout << endl << "================ Syntaxe Correcte" << endl;
     // On affiche le contenu de la table des symboles avant d'exécuter le programme
     cout << endl << "================ Table des symboles avant exécution : " << interpreteur.getTable();
@@ -25,6 +24,17 @@ int main(int argc, char* argv[]) {
     if (interpreteur.getArbre()!=nullptr) interpreteur.getArbre()->executer();
     // Et on vérifie qu'il a fonctionné en regardant comment il a modifié la table des symboles
     cout << endl << "================ Table des symboles apres exécution : " << interpreteur.getTable();
+    cout << "================== Voulez ecrire le programme dans un fichier ? (oui/non) " ;
+    string rep;
+    cin >> rep;
+    if (rep=="oui"){
+    ofstream fichiersortie("programme.cpp", ios::out | ios::trunc);  //déclaration du flux et ouverture du fichier
+        if(fichiersortie){
+             interpreteur.traduitEnCPP(fichiersortie,0);
+             fichiersortie.close();  // on referme le fichier
+        }
+    system("/users/info/etu-s3/devaucod/.Sublime_Text_2/sublime_text /users/info/etu-s3/devaucod/git/Interpreteur/tp5/Debug/programme.cpp &");
+    }
   } catch (InterpreteurException & e) {
     cout << e.what() << endl;
   }

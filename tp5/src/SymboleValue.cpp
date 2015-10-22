@@ -25,8 +25,8 @@ ostream & operator<<(ostream & cout, const SymboleValue & symbole) {
   return cout;
 }
 
-void SymboleValue::traduitEnCPP(ostream & cout,unsigned int indentation)const{
-	cout << this->getChaine();
+void SymboleValue::traduitEnCPP(ofstream & fichier,unsigned int indentation)const{
+	fichier << this->getChaine();
 }
 
 bool SymboleValue::setDefiniTCPP(){

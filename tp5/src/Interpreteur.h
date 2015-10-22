@@ -19,15 +19,16 @@ public:
 
 	inline const TableSymboles & getTable () const  { return m_table;    } // accesseur	
 	inline Noeud* getArbre () const { return m_arbre; }                    // accesseur
-	void traduitEnCPP(ostream & cout, unsigned int indentation) const;
+	void traduitEnCPP(ofstream & fichier, unsigned int indentation) const;
 	
 private:
     Lecteur        m_lecteur;  // Le lecteur de symboles utilisé pour analyser le fichier
     TableSymboles  m_table;    // La table des symboles valués
     Noeud*         m_arbre;    // L'arbre abstrait
+    map<string,Noeud *> * m_listProc;
 
     // Implémentation de la grammaire
-    Noeud*  programme();   //   <programme> ::= procedure principale() <seqInst> finproc FIN_FICHIER
+    Noeud*  programme();   //   <programme> ::= {procedure <CHAINE>() <seqInst> finproc} procedure principale() <seqInst> finproc FIN_FICHIER
     Noeud*  seqInst();	   //     <seqInst> ::= <inst> { <inst> }
     Noeud*  inst();	       //        <inst> ::= <affectation> ; | <instSi> | <instTantQue> | <instRepeter> ; | <instPour> | <instEcrire> ; | <instLire> ;
     Noeud*  affectation(); // <affectation> ::= <variable> = <expression> 
@@ -44,6 +45,7 @@ private:
     Noeud*  instPour();    //    <instPour> ::= pour ( [ <affectation> ] ) ; <expression> ; ( [ <affectation> ] ) <seqInst>	 finpour
     Noeud*  instEcrire();  //  <instEcrire> ::= ecrire ( <expression> | <chaine> | { , <expression> | <chaine> } )
     Noeud*  instLire();    //    <instLire> ::= lire ( <variable> { , <variable> } )
+    Noeud*  instProcedure();    //  <instProcedure> ::= appel <CHAINE>()
 
     // outils pour simplifier l'analyse syntaxique
     void tester (const string & symboleAttendu) const throw (SyntaxeException);   // Si symbole courant != symboleAttendu, on lève une exception

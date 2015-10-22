@@ -14,7 +14,6 @@ jusqua
 lire
 ecrire
 finligne
-appel
 ;
 ,
 =
