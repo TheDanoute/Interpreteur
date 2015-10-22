@@ -17,11 +17,14 @@ public:
 	  inline void setValeur(int valeur)    { this->m_valeur=valeur; m_defini=true;  } // accesseur
 	  inline bool estDefini()              { return m_defini;                       } // accesseur
 
+	  bool setDefiniTCPP();
+
 	  friend ostream & operator << (ostream & cout, const SymboleValue & symbole); // affiche un symbole value sur cout
 	  void traduitEnCPP(ostream & cout,unsigned int indentation)const;
 
 private:
 	  bool m_defini;	// indique si la valeur du symbole est définie
+	  bool m_definiTCPP;
 	  int  m_valeur;	// valeur du symbole si elle est définie, zéro sinon
 
 };

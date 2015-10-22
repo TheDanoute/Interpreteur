@@ -31,9 +31,13 @@ private:
     Noeud*  seqInst();	   //     <seqInst> ::= <inst> { <inst> }
     Noeud*  inst();	       //        <inst> ::= <affectation> ; | <instSi> | <instTantQue> | <instRepeter> ; | <instPour> | <instEcrire> ; | <instLire> ;
     Noeud*  affectation(); // <affectation> ::= <variable> = <expression> 
-    Noeud*  expression();  //  <expression> ::= <facteur> { <opBinaire> <facteur> }
-    Noeud*  facteur();     //     <facteur> ::= <entier>  |  <variable>  |  - <facteur>  | non <facteur> | ( <expression> )
-                           //   <opBinaire> ::= + | - | *  | / | < | > | <= | >= | == | != | et | ou
+    Noeud*  expression();  //  <expression> ::= <terme> { + <terme> | - <terme> }
+    Noeud*  terme();	   //       <terme> ::= <facteur> { * <facteur> | / <facteur> }
+    Noeud*  facteur();     //     <facteur> ::= <entier> | <variable> | - <expBool> | non <expBool> | ( <expBool> )
+    Noeud*  expBool();     //     <expBool> ::= <relationET> { ou <relationET> }
+    Noeud*  relationET();  //  <relationET> ::= <relation> { et <relation> }
+    Noeud*  relation();    //    <relation> ::= <expression> { <opRel> <expression> }
+
     Noeud*  instSi() throw (SyntaxeException);      //      <instSi> ::= si ( <expression> ) <seqInst> { sinonsi ( <expression> ) <seqInst> } [sinon <seqInst>] finsi
     Noeud*  instTantQue(); // <instTantQue> ::= tantque ( <expression> ) <seqInst> fintantque
     Noeud*  instRepeter(); // <instRepeter> ::= repeter <seqInst> jusqua ( <expression> )

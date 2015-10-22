@@ -43,6 +43,8 @@ int NoeudAffectation::executer() {
 }
 
 void NoeudAffectation::traduitEnCPP(ostream & cout,unsigned int indentation)const{
+	if(!((SymboleValue *)m_variable)->setDefiniTCPP())
+		cout << "int ";
 	m_variable->traduitEnCPP(cout,indentation);
 	cout << "=";
 	m_expression->traduitEnCPP(cout,indentation);
@@ -225,11 +227,11 @@ int NoeudInstRepeter::executer() {
 }
 
 void  NoeudInstRepeter::traduitEnCPP(ostream & cout,unsigned int indentation)const{
-	cout << setw(4*indentation) << "do {" << endl;
+	cout << setw(4*indentation) << "" << "do {" << endl;
 	m_sequence->traduitEnCPP(cout,indentation);
-	cout << setw(4*indentation) << "}" << endl << setw(4*indentation) << "while (! ";
+	cout << setw(4*indentation) << "" << "}" << endl << setw(4*indentation) << "while (!( ";
 	m_condition->traduitEnCPP(cout,indentation);
-	cout << " );" << endl << setw(4*indentation) << "}" << endl;
+	cout << " ));" << endl << setw(4*indentation) << "" << "}" << endl;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -283,6 +285,10 @@ int NoeudInstLire::executer(){
 }
 
 void NoeudInstLire::traduitEnCPP(ostream & cout,unsigned int indentation)const{
+	for(auto variable : m_variables){
+		if(!((SymboleValue *)variable)->setDefiniTCPP())
+			cout << "int " << ((SymboleValue *)variable)->getChaine() << ";" << endl ;
+	}
 	cout << setw(4*indentation) << "" <<"cin";
 	for(auto variable : m_variables){
 		cout << " >> ";
@@ -291,15 +297,23 @@ void NoeudInstLire::traduitEnCPP(ostream & cout,unsigned int indentation)const{
 	cout << " ;" << endl;
 }
 
-NoeudChaine::NoeudChaine(string chaine) :
-		m_chaine(chaine){
+NoeudChaine::NoeudChaine(string chaine) {
+	if(chaine!="finligne"){
+		chaine.erase(chaine.begin());
+		chaine.erase(chaine.end()-1);
+	}
+	m_chaine=chaine;
 }
 
 int NoeudChaine::executer(){
-	cout << m_chaine;// Exécute l'instruction tantque : si condition vraie on exécute la séquence
+	if (m_chaine=="finligne")
+		cout << '\n';
+	else cout << m_chaine ;// Exécute l'instruction tantque : si condition vraie on exécute la séquence
 	return 0;
 }
 
 void NoeudChaine::traduitEnCPP(ostream & cout,unsigned int indentation)const{
-	cout << m_chaine ;
+	if (m_chaine=="finligne")
+		cout << "endl";
+	else cout << m_chaine ;
 }

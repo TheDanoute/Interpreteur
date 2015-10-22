@@ -13,6 +13,8 @@ repeter
 jusqua
 lire
 ecrire
+finligne
+appel
 ;
 ,
 =
